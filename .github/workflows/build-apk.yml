@@ -6,6 +6,8 @@ on:
     branches: [main]
     paths:
       - 'CyberpunkThemePark_GitHub.zip'
+      - 'CyberpunkThemePark_GitHub_CORRIGIDO.zip'
+      - '.github/workflows/build-apk.yml'
 
 jobs:
   build:
@@ -14,10 +16,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check project ZIP
+      - name: Locate project ZIP
+        id: project
+        shell: bash
         run: |
-          if [ ! -f CyberpunkThemePark_GitHub.zip ]; then
-            echo "::error::Arquivo CyberpunkThemePark_GitHub.zip não encontrado na raiz do repositório. Envie o ZIP para a raiz e execute novamente."
+          if [ -f CyberpunkThemePark_GitHub_CORRIGIDO.zip ]; then
+            echo "zip=CyberpunkThemePark_GitHub_CORRIGIDO.zip" >> "$GITHUB_OUTPUT"
+          elif [ -f CyberpunkThemePark_GitHub.zip ]; then
+            echo "zip=CyberpunkThemePark_GitHub.zip" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::ZIP não encontrado. Envie CyberpunkThemePark_GitHub_CORRIGIDO.zip (ou CyberpunkThemePark_GitHub.zip) para a raiz do repositório."
             exit 1
           fi
 
@@ -29,7 +37,7 @@ jobs:
 
       - name: Unpack Android project
         run: |
-          unzip -q CyberpunkThemePark_GitHub.zip
+          unzip -q "${{ steps.project.outputs.zip }}"
           test -f CyberpunkThemePark/app/build.gradle
 
       - name: Set up Gradle
