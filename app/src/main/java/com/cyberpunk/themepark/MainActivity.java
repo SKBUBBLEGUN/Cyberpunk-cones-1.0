@@ -117,7 +117,7 @@ public class MainActivity extends Activity {
         TextView label = text(name, 10, Color.WHITE);
         label.setSingleLine(true); label.setEllipsize(android.text.TextUtils.TruncateAt.END);
         card.addView(label);
-        Button remove = new Button(this); remove.setText("REMOVER");
+        Button remove = new Button(this); remove.setText(file != null ? "APAGAR" : "OCULTAR");
         remove.setTextSize(9); remove.setMinHeight(dp(30)); remove.setMinimumHeight(dp(30));
         remove.setPadding(0,0,0,0);
         remove.setTextColor(Color.rgb(255,75,115));
