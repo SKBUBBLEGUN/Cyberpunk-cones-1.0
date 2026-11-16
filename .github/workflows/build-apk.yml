@@ -1,55 +1,41 @@
-name: Build Cyberpunk icon pack APK
+name: Build Cyberpunk Theme Park APK
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'CyberpunkThemePark_GitHub.zip'
-      - 'CyberpunkThemePark_GitHub_CORRIGIDO.zip'
+      - 'app/**'
+      - 'build.gradle'
+      - 'settings.gradle'
+      - 'gradle.properties'
       - '.github/workflows/build-apk.yml'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Locate project ZIP
-        id: project
-        shell: bash
-        run: |
-          if [ -f CyberpunkThemePark_GitHub_CORRIGIDO.zip ]; then
-            echo "zip=CyberpunkThemePark_GitHub_CORRIGIDO.zip" >> "$GITHUB_OUTPUT"
-          elif [ -f CyberpunkThemePark_GitHub.zip ]; then
-            echo "zip=CyberpunkThemePark_GitHub.zip" >> "$GITHUB_OUTPUT"
-          else
-            echo "::error::ZIP não encontrado. Envie CyberpunkThemePark_GitHub_CORRIGIDO.zip (ou CyberpunkThemePark_GitHub.zip) para a raiz do repositório."
-            exit 1
-          fi
-
-      - name: Set up Java
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Unpack Android project
-        run: |
-          unzip -q "${{ steps.project.outputs.zip }}"
-          test -f CyberpunkThemePark/app/build.gradle
-
-      - name: Set up Gradle
+      - name: Set up Gradle 8.11.1
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
 
       - name: Build APK
-        working-directory: CyberpunkThemePark
-        run: gradle assembleDebug
+        run: gradle assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Cyberpunk-Theme-Park-APK
-          path: CyberpunkThemePark/app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
