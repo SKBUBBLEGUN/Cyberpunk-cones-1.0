@@ -1,0 +1,41 @@
+name: Build Cyberpunk icon pack APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'CyberpunkThemePark_GitHub.zip'
+      - '.github/workflows/build-apk.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Unpack Android project
+        run: |
+          unzip -q CyberpunkThemePark_GitHub.zip
+          test -f CyberpunkThemePark/app/build.gradle
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build APK
+        working-directory: CyberpunkThemePark
+        run: gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cyberpunk-Theme-Park-APK
+          path: CyberpunkThemePark/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
