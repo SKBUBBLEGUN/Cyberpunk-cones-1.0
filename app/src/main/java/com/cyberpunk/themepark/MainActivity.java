@@ -141,10 +141,10 @@ public class MainActivity extends Activity {
         Uri uri = data.getData();
         try {
             String name = "image_" + System.currentTimeMillis() + ".png";
+            File folder = new File(getFilesDir(), "custom_icons");
+            if (!folder.exists() && !folder.mkdirs()) throw new IOException("Não foi possível criar a pasta");
             try (InputStream in = getContentResolver().openInputStream(uri);
-                 OutputStream out = new FileOutputStream(new File(getFilesDir(), "custom_icons/" + name))) {
-                File folder = new File(getFilesDir(), "custom_icons");
-                if (!folder.exists()) folder.mkdirs();
+                 OutputStream out = new FileOutputStream(new File(folder, name))) {
                 byte[] buffer = new byte[8192]; int n;
                 while ((n = in.read(buffer)) > 0) out.write(buffer, 0, n);
             }
